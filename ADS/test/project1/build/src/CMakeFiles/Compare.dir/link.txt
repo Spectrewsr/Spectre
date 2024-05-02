@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/Compare.dir/AVL.cpp.o CMakeFiles/Compare.dir/UBS.cpp.o CMakeFiles/Compare.dir/main.cpp.o CMakeFiles/Compare.dir/splay.cpp.o -o ../../bin/Compare 
