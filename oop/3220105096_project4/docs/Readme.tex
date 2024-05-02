@@ -1,0 +1,312 @@
+\documentclass{ctexart} % 使用ctexart类，适合中文文档
+\usepackage{xcolor} 
+\usepackage{enumitem} % 加载enumitem包
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{xeCJK}
+\usepackage{fontspec}
+
+
+
+% 定义listings设置
+\lstset{
+    basicstyle=\ttfamily, % 使用等宽字体
+    commentstyle=\color{gray}, % 注释颜色
+    keywordstyle=\color{blue}, % 关键字颜色
+    frame=single,
+    stringstyle=\color{red}, % 字符串颜色
+    breaklines=true, % 自动换行
+    captionpos=b, % 标题位置在底部
+    showstringspaces=false, % 不显示字符串中的空格标记
+}
+
+
+
+\title{project4}
+\author{3220105096}
+\date{\today}
+
+\begin{document}
+
+\maketitle % 创建标题
+\textbf{\large \textcolor{red} {注意事项：} }
+\begin{large}
+\begin{itemize}[itemsep=0pt, parsep=0pt]
+    \item \textcolor{red} {输入要求：一定要输入日期的方式是day34，day1，day5这种，
+        day与数字之间不要有空格，日记的内容随便有空格，怎么写都行，比如day1 uuu iii mmm}
+    \item 所有的可执行程序在bin中。
+    \item cmake在build中。
+    \item 总的测试脚本（diary\_manager.sh）在总目录下面。
+    \item test文件夹下面的test1\_diary.sh中是一个测试脚本，直接执行可以在
+            test文件夹下面的mydiary.txt中看到结果，并在屏幕上看到输出。
+\end{itemize}
+\end{large}
+
+
+\vspace{10pt}
+
+根据题目的要求，我实现的思路是首先实现一个Diary类，包含所有需要的函数，
+然后根据题目的要求，有四个独立的程序，再用shell脚本对四个程序进行汇总，
+通过shell脚本执行程序。实现了如果add有重复的日期插入，则会删掉以前那个日
+期里面的东西换成心得，在原有位置不变，不会插入到末尾，但是所有没有过的日期默认插入到末尾。
+
+\vspace{10pt}
+
+首先我实现了dairy类,这里面包含add，remove，list，show方法，然后有4个独立的程序
+分别调用了这些方法，实现了4个独立的程序。
+
+\vspace{10pt}
+这是我的Shell测试脚本代码：
+
+\begin{lstlisting}[language=bash, caption=测试代码的脚本]
+#!/bin/bash
+
+# 定义可执行文件的路径
+BIN_DIR="../bin"
+DIARY_FILE="mydiary.txt"
+
+# 清理现场，确保日记文件是空的
+> "$DIARY_FILE"
+
+# 添加条目
+echo "Adding entries..."
+echo "day1" "111 ffff" | "$BIN_DIR/pdadd"
+echo "day3" "333 ttttt" | "$BIN_DIR/pdadd"
+echo "day5" "555 eeeeee eeeee" | "$BIN_DIR/pdadd"
+
+# 列出条目
+echo "day1" "day3" | "$BIN_DIR/pdlist" "Listing entries..." 
+
+# 展示条目
+echo "day3" | "$BIN_DIR/pdshow" "Showing an entry..." 
+
+# 移除条目
+echo "day3" | "$BIN_DIR/pdremove" "Removing an entry..."
+
+# 验证步骤
+
+echo "Test completed."
+\end{lstlisting}
+
+这是执行后的txt文本
+\begin{lstlisting}[caption={My Text}, captionpos=b]
+    day1 111 ffff
+    day5 555 eeeeeeeeeee
+\end{lstlisting}
+可以看出成功的将day3删掉了，并且没有任何多余的空行。
+
+\vspace{10pt}
+\vspace{10pt}
+
+\begin{lstlisting}[language = bash, captionpos=b, caption = 最终脚本]
+    #!/bin/bash
+
+    # 定义可执行文件的目录路径
+    BIN_DIR="./bin"
+
+    # 执行相关程序的函数
+    run_pdadd() {
+        echo "Running pdadd"
+        
+        "$BIN_DIR/pdadd"
+    }
+
+    run_pdlist() {
+        echo "Running pdlist"
+        
+        "$BIN_DIR/pdlist"
+    }
+
+    run_pdremove() {
+        echo "Running pdremove"
+        
+        "$BIN_DIR/pdremove"
+    }
+
+    run_pdshow() {
+        echo "Running pdshow"
+        
+        "$BIN_DIR/pdshow"
+    }
+
+    # 循环直到用户决定退出
+    while true; do
+        echo "Please choose an option:"
+        echo "1. Add entry"
+        echo "2. List entries"
+        echo "3. Remove entry"
+        echo "4. Show entry"
+        echo "5. Exit"
+        read -p "Enter your choice (1/2/3/4/5): " choice
+
+        case $choice in
+            1)
+                run_pdadd
+                ;;
+            2)
+                run_pdlist
+                ;;
+            3)
+                run_pdremove
+                ;;
+            4)
+                run_pdshow
+                ;;
+            5)
+                echo "Exiting..."
+                exit 0
+                ;;
+            *)
+                echo "Invalid option, please try again."
+                ;;
+        esac
+    done
+
+\end{lstlisting}
+
+下面是一段测试
+\begin{lstlisting}[language = {}, caption={final test}, captionpos=b]
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 1
+    Running pdadd
+    select a date
+    day1
+    the content you want to write:
+    111 www
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 1
+    Running pdadd
+    select a date
+    day2
+    the content you want to write:
+    yyy yyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 1
+    Running pdadd
+    select a date
+    day3
+    the content you want to write:
+    uuuuuuuuuuuuuu uuuuuuuuuu
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 1  
+    Running pdadd
+    select a date
+    day7
+    the content you want to write:
+    yyyyyy
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 1
+    Running pdadd
+    select a date
+    day9
+    the content you want to write:
+    99999999
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 1    
+    Running pdadd
+    select a date
+    day11
+    the content you want to write:
+    jjj 666
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 2
+    Running pdlist
+    select the begin date and the end date
+    day2
+    day9
+    day2 yyy yyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+    day3 uuuuuuuuuuuuuu uuuuuuuuuu
+    day7 yyyyyy
+    day9 99999999
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 3
+    Running pdremove
+    the date you want to remove
+    day3
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 2
+    Running pdlist
+    select the begin date and the end date
+    day2 day9
+    day2 yyy yyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+    day7 yyyyyy
+    day9 99999999
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 1
+    Running pdadd
+    select a date
+    day2
+    the content you want to write:
+    daydayday
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5): 4
+    Running pdshow
+    the date you want to show
+    day2
+    day2 daydayday
+    Please choose an option:
+    1. Add entry
+    2. List entries
+    3. Remove entry
+    4. Show entry
+    5. Exit
+    Enter your choice (1/2/3/4/5):
+\end{lstlisting}
+% 这里可以添加你的文档内容
+
+\end{document}

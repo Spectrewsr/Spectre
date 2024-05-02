@@ -1,0 +1,2 @@
+主文件夹下有readme的PDF，
+docs文件夹下面有tex版的readme

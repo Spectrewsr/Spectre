@@ -1,0 +1,345 @@
+\documentclass{ctexart} % 使用ctexart类，适合中文文档
+\usepackage{xcolor} 
+\usepackage{enumitem} % 加载enumitem包
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{xeCJK}
+\usepackage{fontspec}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{nameref}
+
+
+% 定义listings设置
+\lstset{
+    basicstyle=\ttfamily, % 使用等宽字体
+    commentstyle=\color{gray}, % 注释颜色
+    keywordstyle=\color{blue}, % 关键字颜色
+    frame=tb,
+    stringstyle=\color{red}, % 字符串颜色
+    numbers = left,
+    breaklines=true, % 自动换行
+    captionpos=b, % 标题位置在底部
+    showstringspaces=false, % 不显示字符串中的空格标记
+    numberstyle=\tiny\color{green},
+}
+
+\title{project6}
+\author{3220105096}
+\date{\today}
+
+\begin{document}
+\maketitle % 创建标题
+
+\section{题目要求}
+
+Given the declaration of a class template Vector as shown below, implement the bodies of all the member functions. Please also write a main function to test all the facilities of the class Vector.
+\begin{lstlisting}[language = c++, caption = Vector]
+template <class T>
+class Vector {
+public:
+  Vector();                      // creates an empty vector
+  Vector(int size);              // creates a vector for holding 'size' elements
+  Vector(const Vector& r);       // the copy ctor
+  ~Vector();                     // destructs the vector 
+  T& operator[](int index);      // accesses the specified element without bounds checking
+  T& at(int index);              // accesses the specified element, throws an exception of
+                                 // type 'std::out_of_range' when index <0 or >=m_nSize
+  int size() const;              // return the size of the container
+  void push_back(const T& x);    // adds an element to the end 
+  void clear();                  // clears the contents
+  bool empty() const;            // checks whether the container is empty 
+private:
+  void inflate();                // expand the storage of the container to a new capacity,
+                                 // e.g. 2*m_nCapacity
+  T *m_pElements;                // pointer to the dynamically allocated storage
+  int m_nSize;                   // the number of elements in the container
+  int m_nCapacity;               // the total number of elements that can be held in the
+                                 // allocated storage
+};
+\end{lstlisting}
+
+\section{函数实现}
+\subsection{构造函数的实现}
+
+\begin{lstlisting}[language = c++, caption = Vector()]
+    Vector<T>::Vector()
+    {
+        m_nSize = 0;                   
+        m_nCapacity = 1;             
+        m_pElements = new T[m_nCapacity]; 
+    }
+    
+    template <class T>
+    Vector<T>::Vector(int size)
+    {
+        this->m_nSize = size;
+        this->m_nCapacity = size;
+        this->m_pElements = new T[size];
+    }
+    
+    template <class T>
+    Vector<T>::Vector(const Vector& r)
+    {
+        this->m_nSize = r.m_nSize;
+        this->m_nCapacity = r.m_nCapacity;
+        this->m_pElements = new T[m_nCapacity];
+        for ( int i = 0; i < m_nSize; ++i )
+        {
+            m_pElements[i] = r.m_pElements[i];
+        }
+    }
+\end{lstlisting}
+
+\subsection{析构函数}
+\begin{lstlisting}[caption = ~Vector, language = c++]
+    template <class T>
+    Vector<T>::~Vector()
+    {
+    
+        delete[] m_pElements;
+        m_nCapacity = 0;
+        m_nSize = 0;
+        m_pElements = nullptr;
+    }
+\end{lstlisting}
+
+\subsection{私有函数inflate（）}
+\begin{lstlisting}[caption = inflate(), language = c++]
+    template <class T>
+    void Vector<T>::inflate()
+    {
+        if(m_nCapacity == 0)
+        {
+            m_nCapacity = 1;
+        }
+        else
+        {
+            m_nCapacity *= 2 ;
+        }
+    
+        T* newElements = new T[m_nCapacity];
+        for (int i = 0; i < m_nSize; i++) 
+        {
+            newElements[i] = m_pElements[i];
+        }
+    
+        delete[] m_pElements;
+        m_pElements = newElements;
+    }
+    
+\end{lstlisting}
+
+\subsection{公有函数}
+\begin{lstlisting}[caption = public, language = c++]
+    template<class T>
+    int Vector<T>::size() const
+    {
+        return m_nSize;
+    }
+
+    template <class T>
+    T& Vector<T>::operator[](int index) 
+    {
+        return m_pElements[index];
+    }
+
+    template <class T>
+    T& Vector<T>::at(int index) 
+    {
+        if (index < 0 || index >= m_nSize) 
+        {
+            throw std::out_of_range("Index out of range");
+        }
+        return m_pElements[index];
+    }
+    template <class T>
+    bool Vector<T>::empty() const
+    {
+        return m_nSize == 0;
+    }
+
+    template <class T>
+    void Vector<T>::clear()
+    {
+        m_nCapacity = 0;
+        m_nSize = 0;
+        m_pElements = nullptr;
+        delete[] m_pElements;
+    }
+
+    template <class T>
+    void Vector<T>::push_back(const T& x)
+    {
+        if (m_nSize == m_nCapacity) 
+        {
+            inflate();
+        }
+        m_pElements[m_nSize++] = x;
+    }
+
+#endif
+\end{lstlisting}
+
+\section{测试}
+\begin{lstlisting}[language = c++, caption = main]
+    Vector <int> a1;
+    int num;
+    for ( int i = 0; i < 100; ++i )
+    {
+       
+        a1.push_back(i);
+    }
+
+    for ( int i = 0; i < 100; ++i )
+    {
+        std::cout<<a1[i]<<" ";
+    }
+    std::cout<<std::endl;
+    //std::cout<<a1.at(1000)<<std::endl;
+
+
+    Vector <int> a2(a1);
+    std::cout<<a2.size()<<std::endl;
+
+    Vector <int> a3(10000);
+    std::cout<<a3.size()<<std::endl;
+
+
+    Vector <std::string> str;
+    std::string s0;
+    std::cout<<"Input the first string"<<std::endl;
+    std::cin>>s0;
+    str.push_back(s0);
+    std::cout<<str[0]<<std::endl;
+    std::cout<<"Input the Second string"<<std::endl;
+    std::cin>>s0;
+    str.push_back(s0);
+    std::cout<<str[1]<<std::endl;
+
+    a1.~Vector();
+    a2.clear();
+    str.clear();
+
+    std::cout<<a1.size()<<std::endl;
+    std::cout<<a2.size()<<std::endl;
+    std::cout<<str.size()<<std::endl;
+\end{lstlisting}
+
+首先Vector a1：
+a1的预先设置内存为1
+\begin{lstlisting}
+    Vector<T>::Vector()
+    {
+        m_nSize = 0;                   
+        m_nCapacity = 1;             
+        m_pElements = new T[m_nCapacity]; 
+    }
+\end{lstlisting}
+对a1进行100次插入操作。超出原有的内存，自动建立新的内存，说明inflate执行成功。
+
+对a1中的内容执行输出操作，0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99
+
+
+\vspace{10pt}
+
+说明push\_back函数正常运行。\
+
+测试第二个构造函数，
+\vspace*{1pt}
+
+Vector <int> a3(10000);
+\vspace*{1pt}
+
+std::cout<<a3.size()<<std::endl;
+\vspace*{1pt}
+输出为10000，说明第二个构造函数正常运行。
+
+测试第三个构造函数：
+\vspace*{1pt}
+
+Vector <int> a2(a1);
+\vspace*{1pt}
+
+std::cout<<a2.size()<<std::endl;
+\vspace*{1pt}
+
+for ( int i = 0; i < 100; ++i )
+{
+    std::cout<<a2[i]<<" ";
+}
+\vspace*{1pt}
+
+输出0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99
+
+说明第三个构造函数正确
+
+测试at
+\vspace*{1pt}
+
+std::cout<<a1.at(1000)<<std::endl;
+\vspace*{1pt}
+
+抛出报错：
+% 文本之前添加空间
+\vspace{10pt}
+
+\noindent 输出错误消息:
+\begin{verbatim}
+terminate called after throwing an instance of std::out_of_range
+what():  Index out of range
+\end{verbatim}
+
+% 文本之后添加空间
+\vspace{10pt}
+
+说明正确。
+
+测试其他类和operator[]:
+\begin{lstlisting}
+    Vector <std::string> str;
+    std::string s0;
+    std::cout<<"Input the first string"<<std::endl;
+    std::cin>>s0;
+    str.push_back(s0);
+    std::cout<<str.operator[](0)<<std::endl;
+    std::cout<<"Input the Second string"<<std::endl;
+    std::cin>>s0;
+    str.push_back(s0);
+    std::cout<<str.operator[](1)<<std::endl;
+\end{lstlisting}
+输出为：
+\begin{verbatim}
+Input the first string
+zju
+zju
+Input the Second string
+oop
+oop
+\end{verbatim}
+
+说明Vector在类之间通用，并且可以使用operator[]
+
+
+\vspace{10pt}
+
+最后测试析构函数和clear函数
+\begin{verbatim}
+    a1.~Vector();
+    a2.clear();
+    str.clear();
+
+    std::cout<<a1.size()<<std::endl;
+    std::cout<<a2.size()<<std::endl;
+    std::cout<<str.size()<<std::endl;
+\end{verbatim}
+
+输出为
+\begin{verbatim}
+0
+0
+0
+\end{verbatim}
+说明clear函数与析构函数正确。
+\end{document}

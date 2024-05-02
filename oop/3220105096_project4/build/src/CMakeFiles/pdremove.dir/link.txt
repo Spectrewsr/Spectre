@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/pdremove.dir/pdremove.cpp.o CMakeFiles/pdremove.dir/Diary.cpp.o -o ../../bin/pdremove 

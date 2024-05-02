@@ -1,0 +1,147 @@
+`timescale 1ns / 1ps
+
+
+
+module CSSTE(
+    input         clk_100mhz,
+    input         RSTN,
+    input  [3:0]  BTN_y,
+    input  [15:0] SW,
+    output [3:0]  Blue,
+    output [3:0]  Green,
+    output [3:0]  Red,
+    output        HSYNC,
+    output        VSYNC,
+    output [15:0] LED_out,
+    output [7:0]  AN,
+    output [7:0]  segment,
+    output wire tx//新加的
+);
+wire [3:0] BTN_OK;
+wire [15:0] SW_OK;
+wire RST;
+wire [31:0] clkdiv;
+wire clkCPU;
+wire [31:0] CPUdata;
+wire MemRW;
+wire [31:0] ROM_out;
+wire [31:0] Addr_out, Data_out, PC_out;
+wire [31:0] RAM_out;
+wire [31:0] RAM_data_in;
+wire [9:0]  RAM_addr;
+wire data_ram_we;
+wire counter0_out, counter1_out, counter2_out;
+wire [31:0] counter_out;
+wire [31:0] P_data;
+wire GPIOf_we, GPIOe_we, counter_we;
+wire [7:0] point_out, LE_out;
+wire [31:0] Disp_num;
+wire [1:0] counter_set;
+
+SAnti_jitter U9(.clk(clk_100mhz),
+                .RSTN(RSTN),  
+                .Key_y(BTN_y),
+                .SW(SW), 
+                .BTN_OK(BTN_OK), 
+                .SW_OK(SW_OK), 
+                .rst(RST));
+
+clk_div U8(.clk(clk_100mhz),
+           .rst(RST), 
+           .SW2(SW_OK[2]), 
+           .SW8(SW_OK[8]), 
+           .STEP(SW_OK[10]), 
+           .clkdiv(clkdiv), 
+           .Clk_CPU(clkCPU));
+
+SCPU U1(.clk(clkCPU), 
+        .rst(RST), 
+        .Data_in(CPUdata), 
+        .inst_in(ROM_out), 
+        .MemRW(MemRW), 
+        .Addr_out(Addr_out), 
+        .Data_out(Data_out), 
+        .PC_out(PC_out));
+
+ROM_Imem U2(.a(PC_out[11:2]),
+            .spo(ROM_out));
+
+RAM_Dmem U3(.clka(~clk_100mhz),
+            .wea(data_ram_we), 
+            .addra(RAM_addr), 
+            .dina(RAM_data_in), 
+            .douta(RAM_out));
+
+Counter_x U10(.clk(~clkCPU), 
+              .rst(RST), 
+              .clk0(clkdiv[6]), 
+              .clk1(clkdiv[9]), 
+              .clk2(clkdiv[11]),
+              .counter_we(counter_we), 
+              .counter_val(P_data),
+              .counter_ch(counter_set),
+              .counter0_OUT(counter0_out), 
+              .counter1_OUT(counter1_out),
+              .counter2_OUT(counter2_out), 
+              .counter_out(counter_out));
+
+MIO_BUS U4(.clk(clk_100mhz), 
+           .rst(RST), 
+           .BTN(BTN_OK), 
+           .SW(SW_OK), 
+           .mem_w(MemRW),
+           .Cpu_data2bus(Data_out), 
+           .addr_bus(Addr_out), 
+           .ram_data_out(RAM_out), 
+           .led_out(LED_out),
+           .counter_out(counter_out), 
+           .counter0_out(counter0_out), 
+           .counter1_out(counter1_out), 
+           .counter2_out(counter2_out),
+           .Cpu_data4bus(CPUdata), 
+           .ram_data_in(RAM_data_in), 
+           .ram_addr(RAM_addr), 
+           .data_ram_we(data_ram_we),
+           .GPIOf0000000_we(GPIOf_we), 
+           .GPIOe0000000_we(GPIOe_we), 
+           .counter_we(counter_we), 
+           .Peripheral_in(P_data));
+
+Multi_8CH32 U5(.clk(~clkCPU), 
+               .rst(RST), 
+               .EN(GPIOe_we), 
+               .Test(SW_OK[7:5]), 
+               .point_in({clkdiv[31:0], clkdiv[31:0]}),
+               .LES(64'b0), 
+               .Data0(P_data), 
+               .data1({2'b0, PC_out[31:2]}), 
+               .data2(ROM_out), 
+               .data3(counter_out),
+               .data4(Addr_out), 
+               .data5(Data_out), 
+               .data6(CPUdata), 
+               .data7(PC_out),
+               .point_out(point_out), 
+               .LE_out(LE_out), 
+               .Disp_num(Disp_num));
+
+UART uart_inst(.clk(clk_100mhz), .rst(SW[0]), .tx(tx), .pc(PC_out), .inst(inst));
+
+
+
+
+SPIO U7(.clk(~clkCPU),
+        .rst(RST), 
+        .Start(clkdiv[20]), 
+        .EN(GPIOf_we), 
+        .P_Data(P_data), 
+        .counter_set(counter_set), 
+        .LED_out(LED_out));
+
+Seg7_Dev U6(.disp_num(Disp_num), 
+            .point(point_out), 
+            .les(LE_out), 
+            .scan({clkdiv[18], clkdiv[17], clkdiv[16]}),
+            .AN(AN), 
+            .segment(segment));
+endmodule

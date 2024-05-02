@@ -1,0 +1,561 @@
+\documentclass{ctexart} % 使用ctexart类，适合中文文档
+\usepackage{xcolor} 
+\usepackage{enumitem} % 加载enumitem包
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{xeCJK}
+\usepackage{fontspec}
+
+
+
+% 定义listings设置
+\lstset{
+    basicstyle=\ttfamily, % 使用等宽字体
+    commentstyle=\color{gray}, % 注释颜色
+    keywordstyle=\color{blue}, % 关键字颜色
+    frame=single,
+    stringstyle=\color{red}, % 字符串颜色
+    breaklines=true, % 自动换行
+    captionpos=b, % 标题位置在底部
+    showstringspaces=false, % 不显示字符串中的空格标记
+}
+
+\title{8-5 Fraction}
+\author{3220105096   \quad   王思睿}
+\date{\today}
+
+\begin{document}
+\maketitle % 创建标题
+
+添加了对分数进行自动约分的功能，并判断结果是否为0；
+\vspace{10pt}
+
+实现对输入格式不正确的报错。
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 报错示例]
+    输入不正确的格式，如输入2222报错
+        Format error,should be 'numerator/denominator'
+
+    输入的数字超过范围，如3333333333322222222/3报错
+        Input value out of range: 3333333333322222222/3
+
+    输入错误的分数，比如www/2， 报错示例
+        Invalid input: www/2
+
+    输入分母是0，报错
+        Denominator shouldn't be 0!
+\end{lstlisting}
+\vspace{10pt}
+
+这个project有如下基本要求：
+
+\textbf{Write a class that represents a fraction number like 2/3.}
+
+\textbf{The functions below have to be implemented for this class:}
+\begin{enumerate}[itemsep = 0pt, parsep = 0pt]
+    \item \textbf{Default ctor}
+    \item \textbf{Ctor takes two integers as parameters}
+    \item \textbf{Copy ctor}
+    \item \textbf{Arithmetical operators: + - * /}
+    \item \textbf{Relational operators: < <= == != >= >}
+    \item \textbf{Typecast to double}
+    \item \textbf{To string}
+    \item \textbf{Inserter and extractor for streams}
+    \item \textbf{Conversion from a finite decimal string like: 1.414}
+\end{enumerate}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption=1.Default ctor]
+    // 构造函数：Fraction
+    // 描述：默认构造函数，分子和分母都为1
+    Fraction();
+\end{lstlisting}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption=2.Ctor takes two integers as parameters]
+    Fraction::Fraction(int a, int b)
+    {
+        // 初始化分子和分母。
+        this->denominator = b;
+        this->numerator = a;
+    }
+\end{lstlisting}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption=3.Copy ctor]
+    // 拷贝构造函数，用于创建一个已存在分数的副本。
+    Fraction::Fraction(const Fraction& other)
+    {
+        // 拷贝分子和分母。
+        this->denominator = other.denominator;
+        this->numerator = other.numerator;
+    }
+\end{lstlisting}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption=4.Arithmetical operators: + - * /]
+    // 运算符重载：+
+    // 描述：实现分数的加法运算
+    Fraction operator + (Fraction);
+
+    // 运算符重载：-
+    // 描述：实现分数的减法运算
+    Fraction operator - (Fraction);
+
+    // 运算符重载：*
+    // 描述：实现分数的乘法运算
+    Fraction operator * (Fraction);
+
+    // 运算符重载：/
+    // 描述：实现分数的除法运算
+    Fraction operator / (Fraction);
+
+\end{lstlisting}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption={5.Relational operators: \textless, \textless=, ==, !=, \textgreater=, \textgreater}]
+    // 运算符重载：< 
+    // 描述：实现分数的小于比较运算
+    bool operator < (const Fraction&);            
+
+    // 运算符重载：<= 
+    // 描述：实现分数的小于等于比较运算
+    bool operator <= (const Fraction&);
+
+    // 运算符重载：!=
+    // 描述：实现分数的不等于比较运算
+    bool operator != (const Fraction&);
+
+    // 运算符重载：==
+    // 描述：实现分数的等于比较运算
+    bool operator == (const Fraction&);                    
+
+    // 运算符重载：>
+    // 描述：实现分数的大于比较运算
+    bool operator > (const Fraction&);                
+
+    // 运算符重载：>=
+    // 描述：实现分数的大于等于比较运算
+    bool operator >= (const Fraction&);              
+\end{lstlisting}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption=6.Typecast to double]
+    // 将分数转换为双精度浮点数并输出。
+    void fractionoper::frac_to_dou()
+    {
+        Fraction a;
+        double a_double;
+        std::string frac1;
+        std::cout << "Enter your fraction:" << std::endl;
+
+        std::cin >> frac1;
+        try
+        {
+            a = Fraction(frac1); // 尝试将字符串转换为分数对象。
+        }
+        catch(const std::exception& e)
+        {
+            system("clear"); // 清屏。
+            std::cerr << e.what() << '\n'; // 打印错误信息。
+            return;
+        }
+        // 进行转换并输出结果。
+        a_double = static_cast<double>(a.getnum()) / static_cast<double>(a.getden());
+        std::cout << a_double << std::endl;
+    }
+
+\end{lstlisting}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption=7.To string]
+    // 将分数转换为字符串表示，如"1/2"。
+    std::string Fraction::printstr()
+    {
+        std::stringstream ss;
+        ss << this->numerator << "/" << this->denominator;
+        return ss.str();
+    }
+
+\end{lstlisting}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption=8.Inserter and extractor for streams]
+    friend std::istream& operator>>(std::istream& in, Fraction& frac);
+    friend std::ostream& operator<<(std::ostream& out, const Fraction& frac);     
+    
+    void fractionoper::oper_stream()
+    {
+        Fraction a;
+        std::cout<<"Input a fraction\n";
+        std::cin>>a;
+        std::cout<<"The fraction is "<<a<<std::endl;
+    }
+\end{lstlisting}
+
+\vspace{10pt}
+\begin{lstlisting}[language = c++, caption=9.Conversion from a finite decimal string like: 1.414]
+    void fractionoper::dou_to_frac()
+    {
+        std::string frac1;
+        std::cout << "Enter your double number" << std::endl;
+        getchar(); // 清理输入缓冲区。
+        std::cin >> frac1;
+        double num = std::stod(frac1); // 将字符串转换为double。
+        int places = frac1.find('.'); // 查找小数点的位置。
+        places = frac1.size() - places; // 计算小数位数。
+        int numerator = static_cast<int>(num * pow(10, places)); // 转换为分子。
+        int denominator = static_cast<int>(pow(10, places)); // 计算分母。
+        int max_gcd = gcd(numerator, denominator); // 计算最大公约数以简化分数。
+        // 输出转换结果。
+        std::cout << "Conversion from a finite decimal string: " << frac1 << " to a fraction is " << numerator / max_gcd << "/" << denominator / max_gcd << std::endl;
+    }
+\end{lstlisting}
+
+\vspace{10pt}
+
+\large{ 效果展示：}
+\begin{lstlisting}[caption = 测试add]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    1
+    Enter your first fraction:
+    3/3
+    Enter your second fraction:
+    -5/5
+    The result of 3/3 + -5/5 is 0
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    1
+    Enter your first fraction:
+    2/3
+    Enter your second fraction:
+    4/6
+    The result of 2/3 + 4/6 is 4/3
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    1
+    Enter your first fraction:
+    3/5
+    Enter your second fraction:
+    -7/10
+    The result of 3/5 + -7/10 is -1/10
+\end{lstlisting}
+\vspace{10pt}
+
+
+\begin{lstlisting}[caption = 测试sub]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    2
+    Enter your first fraction:
+    3/4
+    Enter your second fraction:
+    7/8 
+    The result of 3/4 - 7/8 is -1/8
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    2
+    Enter your first fraction:
+    5/10
+    Enter your second fraction:
+    1/2
+    The result of 5/10 - 1/2 is 0
+\end{lstlisting}
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 测试mul]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    3
+    Enter your first fraction:
+    0/3
+    Enter your second fraction:
+    2/2
+    The result of 0/3 * 2/2 is 0
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    3
+    Enter your first fraction:
+    5/4
+    Enter your second fraction:
+    -6/8
+    The result of 5/4 * -6/8 is -15/16
+\end{lstlisting}
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 测试div]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    4
+    Enter your first fraction:
+    4/5
+    Enter your second fraction:
+    -3/4
+    The result of (4/5) / (-3/4) is 16/-15
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    4
+    Enter your first fraction:
+    3/4
+    Enter your second fraction:
+    0/4
+    The result of (3/4) / (0/4) is 0
+\end{lstlisting}
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 测试Compare 2 fractions]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    5
+    Enter your first fraction:
+    3/3
+    Enter your second fraction:
+    7/7
+    3/3 == 7/7
+    3/3 <= 7/7
+    3/3 >= 7/7
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    5
+    Enter your first fraction:
+    6/7
+    Enter your second fraction:
+    -3/4
+    6/7 > -3/4
+    6/7 >= -3/4
+    6/7 != -3/4
+\end{lstlisting}
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 测试Turn a fraction to double]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    6
+    Enter your fraction:
+    4/6
+    0.666667
+
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    6
+    Enter your fraction:
+    -4/7
+    -0.571429
+\end{lstlisting}
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 测试Turn a double to fraction]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    7
+    Enter your double number
+    1.414 
+    Conversion from a finite decimal string: 1.414 to a fraction is 707/500
+
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    7
+    Enter your double number
+    -1.414
+    Conversion from a finite decimal string: -1.414 to a fraction is -707/500
+\end{lstlisting}
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 测试Turn a fraction to string]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    8
+    Input your numerator and denominator:
+    23 24
+    The fraction to string is: 23/24
+\end{lstlisting}
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 测试Inserter and extractor for streams]
+    Which operation would you like to take?
+    1: Add
+    2: Sub
+    3: Mul
+    4: Div
+    5: Compare 2 fractions
+    6: Turn a fraction to double
+    7: Turn a double to fraction
+    8: Turn a fraction to string
+    9: Inserter and extractor for streams
+    10: Exit
+
+    9
+    Input a fraction
+    34/42
+    The fraction is 34/42
+\end{lstlisting}
+\vspace{10pt}
+
+\begin{lstlisting}[caption = 测试Exit]
+    输入10表示exit
+    程序会退出。
+\end{lstlisting}
+\vspace{10pt}
+\end{document}

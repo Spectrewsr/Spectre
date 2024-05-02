@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/pdshow.dir/pdshow.cpp.o CMakeFiles/pdshow.dir/Diary.cpp.o -o ../../bin/pdshow 

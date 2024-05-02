@@ -1,0 +1,10 @@
+Alice   Math       90        ART         85             
+Bob     Math       88        English     90        Science     87        Art         85       
+Charlie Computer   92        English     89        Science     91        Geography   87       
+David   Math       85        English     82        Science     88        Music       90       
+Emily   Science    91        English     86        History     89        
+Frank   Math       87        Art         84        Science     90              
+Grace   Math       89        English     87        Science     92        History     89       
+Henry   
+Ivy     Computer   86        English     83        Science     90        History     88       
+Jack    Math       90        English     85        Science     87        Art         89       

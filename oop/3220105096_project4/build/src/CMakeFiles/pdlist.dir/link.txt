@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/pdlist.dir/pdlist.cpp.o CMakeFiles/pdlist.dir/Diary.cpp.o -o ../../bin/pdlist 

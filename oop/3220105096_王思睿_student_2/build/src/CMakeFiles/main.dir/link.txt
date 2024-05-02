@@ -1,0 +1,1 @@
+/usr/bin/c++ -rdynamic CMakeFiles/main.dir/main.cpp.o CMakeFiles/main.dir/student.cpp.o CMakeFiles/main.dir/summary.cpp.o -o ../../bin/main 
